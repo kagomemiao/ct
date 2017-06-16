@@ -83,11 +83,12 @@ block content
 									input(type='text',value="#{(afname == undefined) ? data.af_afname : afname}",name='afname',placeholder='请输入联盟名称', autofocus).form-control
 									label
 										| 备注
-									textarea(rows='5', value="#{ (afdesc == undefined) ? data.af_desc : afdesc }",name='afdesc',placeholder='请输入新的联盟描述').form-control
+									textarea(rows='5', type='textarea', value="#{(afdesc == undefined) ? data.af_desc : afdesc }", name='afdesc',placeholder='请输入新的联盟描述').form-control
+										| #{(afdesc == undefined) ? data.af_desc : afdesc }
 							.box-footer
 								input(type="hidden",name="_method", value="PUT")
 								button(type='submit').btn.btn-primary
 									i.fa.fa-pencil 
 									|  提交
-								a(href='javascript:history.back()').btn.btn-primary.pull-right
+								a(href='/').btn.btn-primary.pull-right
 									| 返回

@@ -230,7 +230,6 @@ router.get('/edit/(:id)', checkAdmin, function(req,res,next){
 				}
 				else
 				{	
-					console.log(rows);
 					res.render('contact/edit',{title:"编辑联系人",data:rows[0],username: res.locals.islogin,});
 
 				}
@@ -445,11 +444,11 @@ router.delete('/afdelete/(:id)', checkAdmin, function(req, res, next) {
 				{
 					var errors_detail  = ("Error Delete : %s ",err);
 					req.flash('msg_error', errors_detail); 
-					res.redirect('/contact/afnamelist');
+					res.redirect('/');
 				}
 				else{
 					req.flash('msg_info', '成功删除联盟'); 
-					res.redirect('/contact/afnamelist');
+					res.redirect('/');
 				}
 			});
 		});
@@ -469,17 +468,18 @@ router.get('/afedit/(:id)', checkAdmin, function(req,res,next){
 			{
 				var errornya  = ("Error Selecting : %s ",err );  
 				req.flash('msg_error', errornya); 
-				res.redirect('/contact/afnamelist'); 
+				res.redirect('/'); 
 			}else
 			{
 				if(rows.length <=0)
 				{
 					req.flash('msg_error', "该联盟不存在!"); 
-					res.redirect('/contact/afnamelist');
+					res.redirect('/');
 				}
 				else
 				{	
-					console.log(rows);
+					var data = rows[0].af_desc;
+					console.log(data);
 					res.render('contact/afedit',
 						{
 							title:"编辑联盟",
@@ -494,11 +494,17 @@ router.get('/afedit/(:id)', checkAdmin, function(req,res,next){
 	});
 });
 router.put('/afedit/(:id)', checkAdmin, function(req,res,next){
+	if(req.cookies.islogin){
+		req.session.islogin = req.cookies.islogin;
+	}
+	if(req.session.islogin){
+		res.locals.islogin = req.session.islogin;
+	}
 	req.assert('afname', '联盟名不能为空').notEmpty();
 	var errors = req.validationErrors();
 	if (!errors) {
 		v_afname = req.sanitize( 'afname' ).escape().trim();
-		v_afdesc = req.sanitize( 'afdesc' ).escape().trim();
+		v_afdesc = req.param( 'afdesc' );
 
 		var contact = {
 			af_afname: v_afname,
@@ -517,10 +523,11 @@ router.put('/afedit/(:id)', checkAdmin, function(req,res,next){
 						title: "出现了错误",
 						afname: req.param( 'afname' ),
 						afdesc: req.param( 'afdesc' ), 
+						username: res.locals.islogin,
 					});
 				}else{
 					req.flash('msg_info', '更新联盟资料成功'); 
-					res.redirect('/contact/afnamelist');
+					res.redirect('/');
 				}		
 			});
 		});
@@ -541,6 +548,7 @@ router.put('/afedit/(:id)', checkAdmin, function(req,res,next){
 			id: req.param('id'),
 			afname: req.param('afname'),
 			afdesc: req.param('afdesc'), 
+			username: res.locals.islogin,
 		});
 	}
 });
@@ -557,7 +565,7 @@ router.post('/afadd', checkAuth, function(req, res, next) {
 	if (!errors) {
 
 		v_afname = req.sanitize( 'afname' ).escape().trim();
-		v_afdesc = req.sanitize( 'afdesc' ).escape().trim(); 
+		v_afdesc = req.param( 'afdesc' );
 
 		var list = {
 			af_afname: v_afname,
@@ -579,7 +587,7 @@ router.post('/afadd', checkAuth, function(req, res, next) {
 					});
 				}else{
 					req.flash('msg_info', '成功添加联盟'); 
-					res.redirect('/contact/afnamelist');
+					res.redirect('/');
 				}		
 			});
 		});
