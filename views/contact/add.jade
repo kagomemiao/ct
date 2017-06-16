@@ -1,0 +1,101 @@
+extends ../layout/base 
+block content 
+	section.content
+		.box
+			nav.navbar.navbar-default
+				.container-fluid
+					.navbar-header
+						button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1')
+							span.sr-only Toggle navigation
+							span.icon-bar
+							span.icon-bar
+							span.icon-bar
+						a.navbar-brand(href='#') 添加联系人
+					#bs-example-navbar-collapse-1.collapse.navbar-collapse
+						ul.nav.navbar-nav
+							//-
+								li(role='presentation')
+									a(href='/contact')
+										| 联系人列表
+							li(role='presentation')
+								a(href='/contact')
+									| 联盟列表
+							- if (session.isadmin)
+								li(role='presentation')
+									a(href='./userlist')
+										| 用户列表
+								//-
+									li(role='presentation')
+										a(href='./adduser')
+											| 添加用户
+							- if (session.islogin)
+								li.active(role='presentation')
+									a(href='#')
+										| 添加联系人
+										span.sr-only (current)
+						ul.nav.navbar-nav.pull-right
+							li.dropdown
+								a.dropdown-toggle(href='#',data-toggle='dropdown')
+									| 欢迎, #{username}
+									b.caret
+								ul.dropdown-menu
+									li
+										a(href='/contact/editps')
+											i.fa.fa-cog
+											| 修改密码
+									li.divider
+									li
+										a(href='/contact/logout')
+											i.fa.fa-power-off
+											| 登出
+			.box-body
+				form(role='form',method='post' action='/contact/add')
+					.row
+						
+						.col-xs-6
+							.box-body
+								- if (messages.msg_error) 
+									.alert.alert-danger.alert-dismissable 
+										button.close(type='button', data-dismiss='alert', aria-hidden='true') 
+											| ×
+										h4
+											i.icon.fa.fa-ban
+											| 注意! 
+										| !{messages.msg_error}
+								.form-group
+									label
+										| 联盟名称
+									select(name='afid').form-control
+										for row in data
+											option(value='#{row.af_id}') #{row.af_afname}
+								.form-group
+									label
+										| 联系人
+										small *必填
+									input(type='text',value='#{name}',name='name',placeholder='请输入联系人姓名', autofocus).form-control
+								.form-group
+									label
+										| 职位
+									input(type='text',value='#{aftitle}',name='aftitle',placeholder='请输入职位', autofocus).form-control
+								.form-group
+									label
+										| Email
+										small *必填
+									input(type='text',value='#{email}',name='email',placeholder='请输入Email').form-control
+								.form-group
+									label
+										| 电话
+									input(type='text',name='phone',placeholder='请输入电话').form-control
+								.form-group
+									label
+										| Skype
+									input(type='text',name='skype',placeholder='请输入Skype').form-control
+								.form-group
+									label
+										| 备注
+									textarea(rows='5', name='address',placeholder='请输入备注信息').form-control
+							.box-footer
+								button(type='submit').btn.btn-primary
+									| 提交
+								a(href='/contact').btn.btn-primary.pull-right
+									| 返回

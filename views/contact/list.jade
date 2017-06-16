@@ -1,0 +1,125 @@
+extends ../layout/base 
+block content 
+	section.content
+		.box
+			nav.navbar.navbar-default
+				.container-fluid
+					.navbar-header
+						button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1')
+							span.sr-only Toggle navigation
+							span.icon-bar
+							span.icon-bar
+							span.icon-bar
+						a.navbar-brand(href='#') 联系人列表
+					#bs-example-navbar-collapse-1.collapse.navbar-collapse
+						ul.nav.navbar-nav
+							li.active(role='presentation')
+								a(href='/contact')
+									| 联系人列表
+									span.sr-only (current)
+							li(role='presentation')
+								a(href='/contact/afnamelist')
+									| 联盟列表
+							- if (session.islogin)
+								li(role='presentation')
+									a(href='contact/add')
+										| 添加联系人
+								li(role='presentation')
+									a(href='contact/afadd')
+										| 添加联盟
+							- if (session.isadmin)
+								li(role='presentation')
+									a(href='contact/userlist')
+										| 用户列表
+								li(role='presentation')
+									a(href='contact/adduser')
+										| 添加用户
+						- if (session.islogin)
+							ul.nav.navbar-nav.pull-right
+								li.dropdown
+									a.dropdown-toggle(href='#',data-toggle='dropdown')
+										| 欢迎 #{username}
+										b.caret
+									ul.dropdown-menu
+										li
+											a(href='/contact/editps')
+												i.icon-cog
+												| 修改密码
+										li.divider
+										li
+											a(href='/contact/logout')
+												i.icon-off
+												| 登出
+						- if (!session.islogin)
+							form#signin.navbar-form.navbar-right(method='post', action='?')
+								.input-group
+									span.input-group-addon
+										i.fa.fa-user
+									input#email.form-control(type='text', name='username', value='#{username}', placeholder='账号')
+								.input-group
+									span.input-group-addon
+										i.fa.fa-lock
+									input#password.form-control(type='password', name='password', value='#{password}', placeholder='密码')
+								button.btn.btn-primary(type='submit') 登录
+			.box-body
+				- if(messages.msg_info)
+					.alert.alert-success.alert-dismissable
+						button.close(type='button', data-dismiss='alert', aria-hidden='true')
+							| ×
+						h4
+							i.icon.fa.fa-check
+							| 成功!
+						| !{messages.msg_info}
+				- if(messages.msg_error)
+					.alert.alert-danger.alert-dismissable
+						button.close(type='button', data-dismiss='alert', aria-hidden='true')
+							| ×
+						h4
+							i.icon.fa.fa-ban
+							| Alert!
+						| !{messages.msg_error}
+				.data-table
+					table.table.table-bordered(data-toggle='table', data-toolbar='#toolbar', data-sort-order='desc', data-search='true')
+						thead
+							tr
+								th
+									| 序号
+								th(data-field='afname', data-sortable='true')
+									| 联盟名称
+								th(data-field='name', data-sortable='true')
+									| 联系人
+								th
+									| 职位
+								th
+									| 电话
+								th
+									| Skype
+								th
+									| Email
+								th
+									| 备注信息
+								- if (session.isadmin)
+									th
+										| 操作
+						for row, index in data 
+							tr
+								td #{index+1}
+								td 
+									a(data-toggle='tooltip', title='#{row.afdesc}', data-placement='top',href='/contact/aflist/#{row.afid}') #{row.afname}
+								td #{row.name}
+								td #{row.aftitle}
+								td #{row.phone}
+								td #{row.skype}
+								td #{row.email}
+								td #{row.address}
+								- if (session.isadmin)
+									td
+										div(style='display:inline-block')
+											a(href='/contact/edit/#{row.id}').btn.btn-sm.btn-primary#btn-edit
+													i.fa.fa-edit  编辑
+										| 
+										div(style='display:inline-block')
+											form(method='post', action='/contact/delete/#{row.id}')
+												input(type="hidden",name="_method", value="DELETE")
+												button.btn.btn-sm.btn-danger#del(type='submit', data-toggle='tooltip', title='直接删除', data-placement='right')
+													i.fa.fa-remove  删除

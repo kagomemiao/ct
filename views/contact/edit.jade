@@ -1,0 +1,112 @@
+extends ../layout/base 
+block content 
+	section.content
+		.box
+			nav.navbar.navbar-default
+				.container-fluid
+					.navbar-header
+						button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1')
+							span.sr-only Toggle navigation
+							span.icon-bar
+							span.icon-bar
+							span.icon-bar
+						a.navbar-brand(href='#') 修改联系人资料
+					#bs-example-navbar-collapse-1.collapse.navbar-collapse
+						ul.nav.navbar-nav
+							//-
+								li(role='presentation')
+									a(href='/contact')
+										| 联系人列表
+							li(role='presentation')
+								a(href='/contact')
+									| 联盟列表
+							//-
+								- if (session.islogin)
+									li(role='presentation')
+										a(href='../add')
+											| 添加联系人
+									li(role='presentation')
+										a(href='../afadd')
+											| 添加联盟
+							- if (session.isadmin)
+								li(role='presentation')
+									a(href='../userlist')
+										| 用户列表
+								//-
+									li(role='presentation')
+										a(href='../adduser')
+											| 添加用户
+								li.active(role='presentation')
+									a(href='#')
+										| 编辑联系人
+										span.sr-only (current)
+						ul.nav.navbar-nav.pull-right
+							li.dropdown
+								a.dropdown-toggle(href='#',data-toggle='dropdown')
+									| 欢迎, #{username}
+									b.caret
+								ul.dropdown-menu
+									li
+										a(href='/contact/editps')
+											i.fa.fa-cog
+											| 修改密码
+									li.divider
+									li
+										a(href='/contact/logout')
+											i.fa.fa-power-off
+											| 登出
+			.box-body
+				form(role='form',method='post' action='/contact/edit/#{(id==undefined) ? data.id : id}')
+					.row
+						
+						.col-xs-6
+							.box-body
+								- if (messages.msg_error) 
+									.alert.alert-danger.alert-dismissable 
+										button.close(type='button', data-dismiss='alert', aria-hidden='true') 
+											| ×
+										h4
+											i.icon.fa.fa-warning
+											| 注意! 
+										| !{messages.msg_error}
+								- if (messages.msg_info) 
+									.alert.alert-success.alert-dismissable 
+										button.close(type='button', data-dismiss='alert', aria-hidden='true') 
+											| ×
+										h4
+											i.icon.fa.fa-check
+											| 成功! 
+										| !{messages.msg_info}
+								.form-group
+									label
+										| 联系人
+										small *必填
+									input(type='text',value="#{(name == undefined) ? data.name : name}",name='name',placeholder='请输入联系人姓名', autofocus).form-control
+								.form-group
+									label
+										| 职位
+									input(type='text',value="#{(aftitle == undefined) ? data.aftitle : aftitle}",name='aftitle',placeholder='请输入联系人职位', autofocus).form-control
+								.form-group
+									label
+										| Email
+										small *必填
+									input(type='text',value="#{ (email == undefined) ? data.email : email }",name='email',placeholder='请输入Email').form-control
+								.form-group
+									label
+										| 电话
+									input(type='text',value="#{ (phone == undefined) ? data.phone : phone }",name='phone',placeholder='请输入电话').form-control
+								.form-group
+									label
+										| Skype
+									input(type='text',value="#{ (skype == undefined) ? data.skype : skype }",name='skype',placeholder='请输入Skype').form-control
+								.form-group
+									label
+										| 备注
+									textarea(rows='5', value="#{ (address == undefined) ? data.address : address }",name='address',placeholder='请输入备注信息').form-control
+							.box-footer
+								input(type="hidden",name="_method", value="PUT")
+								button(type='submit').btn.btn-primary
+									i.fa.fa-pencil 
+									|  提交
+								a(href='javascript:history.back()').btn.btn-primary.pull-right
+									| 返回

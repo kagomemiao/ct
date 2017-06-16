@@ -1,0 +1,108 @@
+extends ../layout/base 
+block content 
+	section.content
+		.box
+			nav.navbar.navbar-default
+				.container-fluid
+					.navbar-header
+						button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1')
+							span.sr-only Toggle navigation
+							span.icon-bar
+							span.icon-bar
+							span.icon-bar
+						a.navbar-brand(href='#') 用户列表
+					#bs-example-navbar-collapse-1.collapse.navbar-collapse
+						ul.nav.navbar-nav
+							//-
+								li(role='presentation')
+									a(href='/contact')
+										| 联系人列表
+							li(role='presentation')
+								a(href='/contact')
+									| 联盟列表
+							//-
+								- if (session.islogin)
+									li(role='presentation')
+										a(href='./add')
+											| 添加联系人
+									li(role='presentation')
+										a(href='./afadd')
+											| 添加联盟
+							- if (session.isadmin)
+								li.active(role='presentation')
+									a(href='#')
+										| 用户列表
+										span.sr-only (current)
+								//-
+									li(role='presentation')
+										a(href='./adduser')
+											| 添加用户
+						- if (session.isadmin)
+							ul.nav.navbar-nav.pull-right
+								li.dropdown
+									a.dropdown-toggle(href='#',data-toggle='dropdown')
+										| 欢迎, #{username}
+										b.caret
+									ul.dropdown-menu
+										li
+											a(href='/contact/editps')
+												i.fa.fa-cog
+												| 修改密码
+										li.divider
+										li
+											a(href='/contact/logout')
+												i.fa.fa-power-off
+												| 登出
+			.box-body
+				- if(messages.msg_info)
+					.alert.alert-success.alert-dismissable
+						button.close(type='button', data-dismiss='alert', aria-hidden='true')
+							| ×
+						h4
+							i.icon.fa.fa-check
+							| 成功!
+						| !{messages.msg_info}
+				- if(messages.msg_error)
+					.alert.alert-danger.alert-dismissable
+						button.close(type='button', data-dismiss='alert', aria-hidden='true')
+							| ×
+						h4
+							i.icon.fa.fa-ban
+							| Alert!
+						| !{messages.msg_error}
+				.data-table
+					- if (session.isadmin)
+						#toolbar.btn-group
+							a.btn.btn-default(type='button',href='./adduser')
+								i.fa.fa-user-plus
+					table.table.table-bordered(data-toggle='table', data-toolbar='#toolbar', data-sort-order='desc', data-search='true')
+						thead
+							tr
+								th
+									| 序号
+								th(data-field='username', data-sortable='true')
+									| 用户名
+								th(data-field='auth', data-sortable='true')
+									| 权限
+								- if (session.isadmin)
+									th
+										| 操作
+						for row, index in data 
+							tr
+								td #{index+1}
+								td #{row.st_username}
+								- if (row.is_admin == '1')
+									td 管理员
+								- else
+									td 普通用户
+								- if (session.isadmin)
+									td
+										div(style='display:inline-block')
+											a(href='/contact/edituser/#{row.st_id}').btn.btn-sm.btn-primary#btn-edit
+													i.fa.fa-edit  权限
+										| 
+										div(style='display:inline-block')
+											form(method='post', action='/contact/deluser/#{row.st_id}')
+												input(type="hidden",name="_method", value="DELETE")
+												button.btn.btn-sm.btn-danger#del(type='submit', data-toggle='tooltip', title='直接删除', data-placement='right')
+													i.fa.fa-remove  删除

@@ -1,0 +1,54 @@
+extends ../layout/base 
+block content 
+	section.content-header 
+		h1 
+			| 添加
+			small 添加联系人资料
+	section.content
+		.box
+			.box-header.with-border
+				h3.box-title
+					| 联系资料
+				.box-tools.pull-right
+					button(type='button', data-widget='collapse', data-toggle='tooltip',title='collapse').btn.btn-box-tool
+						i.fa.fa-minus
+					
+			.box-body
+				form(role='form',method='post' action='/customers/add')
+					.row
+						
+						.col-xs-6
+							.box-body
+								- if (messages.msg_error) 
+									.alert.alert-danger.alert-dismissable 
+										button.close(type='button', data-dismiss='alert', aria-hidden='true') 
+											| ×
+										h4
+											i.icon.fa.fa-ban
+											| 注意! 
+										| !{messages.msg_error}
+								.form-group
+									label
+										| 联盟名称
+									input(type='text',value='#{afname}',name='afname',placeholder='请输入联盟名称', autofocus).form-control
+								.form-group
+									label
+										| 联系人
+									input(type='text',value='#{name}',name='name',placeholder='请输入联系人姓名', autofocus).form-control
+								.form-group
+									label
+										| 地址
+									input(type='text',name='address',placeholder='请输入地址').form-control
+								.form-group
+									label
+										| Email
+									input(type='text',value='#{email}',name='email',placeholder='请输入Email').form-control
+								.form-group
+									label
+										| 电话
+									input(type='text',name='phone',placeholder='请输入电话').form-control
+							.box-footer
+								button(type='submit').btn.btn-primary
+									| 提交
+								a(href='/customers').btn.btn-primary.pull-right
+									| 返回

@@ -1,0 +1,72 @@
+extends ../layout/base 
+block content 
+	section.content-header 
+		h1 
+			| 列表
+			small 联盟联系资料
+	section.content
+		.box
+			.box-header.with-border
+				h3.box-title
+					| 联系列表
+				.box-tools.pull-right
+					button(type='button', data-widget='collapse', data-toggle='tooltip',title='collapse').btn.btn-box-tool
+						i.fa.fa-minus
+			.box-body
+				- if(messages.msg_info)
+					.alert.alert-success.alert-dismissable
+						button.close(type='button', data-dismiss='alert', aria-hidden='true')
+							| ×
+						h4
+							i.icon.fa.fa-check
+							| 成功!
+						| !{messages.msg_info}
+				- if(messages.msg_error)
+					.alert.alert-danger.alert-dismissable
+						button.close(type='button', data-dismiss='alert', aria-hidden='true')
+							| ×
+						h4
+							i.icon.fa.fa-ban
+							| Alert!
+						| !{messages.msg_error}
+				a(href='customers/add').pull-left.btn.btn-primary
+					i.fa.fa-plus 
+					|  添加
+				.data-table
+					table.table.table-bordered
+						tr
+							th
+								| 序号
+							th
+								| 联盟名称
+							th
+								| 联系人
+							th
+								| 电话
+							th
+								| Email
+							th
+								| 地址
+							th
+								| 操作
+							if messages.msg_error
+								| !{messages.msg_error}
+							else
+								for row, index in data 
+									tr
+										td #{index+1}
+										td #{row.afname}
+										td #{row.name}
+										td #{row.email}
+										td #{row.phone}
+										td #{row.address}
+										td
+											div(style='display:inline-block')
+												a(href='/customers/edit/#{row.id}').btn.btn-sm.btn-primary
+														i.fa.fa-edit
+											| 
+											div(style='display:inline-block')
+												form(method='post', action='/customers/delete/#{row.id}')
+													input(type="hidden",name="_method", value="DELETE")
+													button.btn.btn-sm.btn-danger(type='submit')
+														i.fa.fa-remove

@@ -1,0 +1,32 @@
+body {
+  /*padding: 10px;*/
+  /*font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;*/
+}
+
+a {
+  /*color: #00B7FF;*/
+}
+/*.content-header{
+	padding-bottom: 15px;
+	padding-right: 30px;
+}*/
+h1{
+	color:#f4f4f4;
+}
+.navbar{
+	margin-bottom: 0;
+}
+
+label>small{
+	color: #ababab;
+}
+#del{
+	padding:5px;
+	font-size: 10px;
+	background-color: #dd4b39;
+	border-color: #dd4b39;
+}
+#btn-edit{
+	padding:5px;
+	font-size: 10px;
+}
