@@ -122,7 +122,8 @@ block content
 								td #{row.phone}
 								td #{row.skype}
 								td #{row.email}
-								td #{row.address}
+								td
+									pre #{row.address}
 								- if (session.isadmin)
 									td
 										div(style='display:inline-block')

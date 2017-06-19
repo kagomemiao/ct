@@ -65,7 +65,9 @@ block content
 								.form-group
 									label
 										| 联盟名称
+										small *必填
 									select(name='afid').form-control
+										option(value='') 请选择
 										for row in data
 											option(value='#{row.af_id}') #{row.af_afname}
 								.form-group

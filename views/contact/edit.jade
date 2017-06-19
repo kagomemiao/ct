@@ -103,6 +103,7 @@ block content
 									label
 										| 备注
 									textarea(rows='5', value="#{ (address == undefined) ? data.address : address }",name='address',placeholder='请输入备注信息').form-control
+										| #{(address == undefined) ? data.address : address }
 							.box-footer
 								input(type="hidden",name="_method", value="PUT")
 								button(type='submit').btn.btn-primary

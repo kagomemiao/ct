@@ -65,7 +65,7 @@ function loadUser(req, res, next){
 							if(rows[0].st_password === pswd){
 								req.session.islogin = req.param('username');
 								res.locals.islogin = req.session.islogin;
-								res.cookie('islogin',res.locals.islogin,{maxAge: 24*60*60*1000});
+								res.cookie('islogin',res.locals.islogin,{maxAge: 3*60*60*1000});
 								req.flash('msg_info', '登陆成功');
 								if(rows[0].is_admin === 1){
 									req.session.isadmin = rows[0].is_admin;
@@ -246,7 +246,7 @@ router.put('/edit/(:id)', checkAdmin, function(req,res,next){
 		v_name = req.sanitize( 'name' ).escape().trim();
 		v_aftitle = req.sanitize( 'aftitle' ).escape().trim();
 		v_email = req.sanitize( 'email' ).escape().trim();
-		v_address = req.sanitize( 'address' ).escape().trim();
+		v_address = req.sanitize( 'address' ).trim();
 		v_phone = req.sanitize( 'phone' ).escape().trim();
 		v_skype = req.sanitize( 'skype' ).escape().trim();
 
@@ -307,6 +307,7 @@ router.put('/edit/(:id)', checkAdmin, function(req,res,next){
 });
 
 router.post('/add', checkAuth, function(req, res, next) {
+	req.assert('afid', '请选择联盟').notEmpty();
 	req.assert('name', '联系人姓名不能为空').notEmpty();
 	req.assert('email', '邮件格式有误').notEmpty().withMessage('邮件不能为空').isEmail();
 	var errors = req.validationErrors();
@@ -315,7 +316,7 @@ router.post('/add', checkAuth, function(req, res, next) {
 		v_name = req.sanitize( 'name' ).escape().trim(); 
 		v_aftitle = req.sanitize( 'aftitle' ).escape().trim();
 		v_email = req.sanitize( 'email' ).escape().trim();
-		v_address = req.sanitize( 'address' ).escape().trim();
+		v_address = req.sanitize( 'address' ).trim();
 		v_phone = req.sanitize( 'phone' ).escape().trim();
 		v_skype = req.sanitize( 'skype' ).escape().trim();
 
@@ -504,7 +505,7 @@ router.put('/afedit/(:id)', checkAdmin, function(req,res,next){
 	var errors = req.validationErrors();
 	if (!errors) {
 		v_afname = req.sanitize( 'afname' ).escape().trim();
-		v_afdesc = req.param( 'afdesc' );
+		v_afdesc = req.sanitize( 'afdesc' ).trim();
 
 		var contact = {
 			af_afname: v_afname,
@@ -926,6 +927,7 @@ module.exports = router;
 function checkAuth(req, res, next) {
   if (!req.session.islogin) {
 	res.clearCookie('islogin');
+	res.clearCookie('isadmin');
 	req.session.destroy();
     res.send('您没有相关权限<br><a href="javascript:history.back()">返回</a>');
   } else {
@@ -935,6 +937,7 @@ function checkAuth(req, res, next) {
 
 function checkAdmin(req, res, next) {
   if (!req.session.isadmin) {
+  	res.clearCookie('islogin');
 	res.clearCookie('isadmin');
 	req.session.destroy();
 	res.send('您不是管理员<br><a href="javascript:history.back()">返回</a>');
