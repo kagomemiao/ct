@@ -250,38 +250,83 @@ router.put('/edit/(:id)', checkAdmin, function(req,res,next){
 		v_phone = req.sanitize( 'phone' ).escape().trim();
 		v_skype = req.sanitize( 'skype' ).escape().trim();
 
-		var contact = {
-			name: v_name,
-			aftitle: v_aftitle,
-			address: v_address,
+		var checkEmail = {
 			email: v_email,
-			phone : v_phone,
-			skype: v_skype,
 		}
 
-		var update_sql = 'update contact SET ? where id = '+req.params.id;
-		req.getConnection(function(err,connection){
-			var query = connection.query(update_sql, contact, function(err, result){
-				if(err)
-				{
-					var errors_detail  = ("Error Update : %s ",err );   
+		var find_sql = 'select * from contact where ?';
+
+		req.getConnection(function(err, connection){
+			var query = connection.query(find_sql, checkEmail, function(err, result){
+				if(err){
+					var errors_detail  = ("Error Insert : %s ",err );   
 					req.flash('msg_error', errors_detail); 
 					res.render('contact/edit', 
 					{ 
+						title: '出现了错误',
+						id: req.param('id'),
 						name: req.param('name'), 
 						aftitle: req.param('aftitle'),
 						address: req.param('address'),
 						email: req.param('email'),
 						phone: req.param('phone'),
 						skype: req.param('skype'),
+						username: res.locals.islogin,
 					});
 				}else{
-					req.flash('msg_info', '更新联系人资料成功'); 
-					res.redirect('/contact');
-				}		
+					console.log(result);
+					if(result.length > 0){
+					var errors_dup = "该Email已存在";
+					req.flash('msg_error', errors_dup);
+					res.render('contact/edit',
+					{
+						title: '该Email已存在',
+						id: req.param('id'),
+						name: req.param('name'), 
+						aftitle: req.param('aftitle'),
+						address: req.param('address'),
+						email: req.param('email'),
+						phone: req.param('phone'),
+						skype: req.param('skype'),
+						username: res.locals.islogin,
+					});
+					}else if(result.length <= 0){
+						var contact = {
+							name: v_name,
+							aftitle: v_aftitle,
+							address: v_address,
+							email: v_email,
+							phone : v_phone,
+							skype: v_skype,
+						}
+						var update_sql = 'update contact SET ? where id = '+req.params.id;
+						req.getConnection(function(err,connection){
+							var query = connection.query(update_sql, contact, function(err, result){
+								if(err)
+								{
+									var errors_detail  = ("Error Update : %s ",err );   
+									req.flash('msg_error', errors_detail); 
+									res.render('contact/edit', 
+									{ 
+										name: req.param('name'),
+										id: req.param('id'),
+										aftitle: req.param('aftitle'),
+										address: req.param('address'),
+										email: req.param('email'),
+										phone: req.param('phone'),
+										skype: req.param('skype'),
+									});
+								}else{
+									req.flash('msg_info', '更新联系人资料成功'); 
+									res.redirect('/contact');
+								}		
+							});
+						});
+					}
+				}
 			});
 		});
-	}else{
+}else{
 
 		console.log(errors);
 		errors_detail = "<p>出现了以下错误</p><ul>";
@@ -311,55 +356,109 @@ router.post('/add', checkAuth, function(req, res, next) {
 	req.assert('name', '联系人姓名不能为空').notEmpty();
 	req.assert('email', '邮件格式有误').notEmpty().withMessage('邮件不能为空').isEmail();
 	var errors = req.validationErrors();
-	if (!errors) {
-		v_afid = req.param('afid');
-		v_name = req.sanitize( 'name' ).escape().trim(); 
-		v_aftitle = req.sanitize( 'aftitle' ).escape().trim();
-		v_email = req.sanitize( 'email' ).escape().trim();
-		v_address = req.sanitize( 'address' ).trim();
-		v_phone = req.sanitize( 'phone' ).escape().trim();
-		v_skype = req.sanitize( 'skype' ).escape().trim();
+	req.getConnection(function(err,connection){
+		var query = connection.query('select * from af_list',function(err,rows)
+		{
+			if(err)
+				var errslt  = ("Error Selecting : %s ",err );
+			req.flash('msg_error', errslt);
+			if (!errors) {
+				v_afid = req.param('afid');
+				v_name = req.sanitize( 'name' ).escape().trim(); 
+				v_aftitle = req.sanitize( 'aftitle' ).escape().trim();
+				v_email = req.sanitize( 'email' ).escape().trim();
+				v_address = req.sanitize( 'address' ).trim();
+				v_phone = req.sanitize( 'phone' ).escape().trim();
+				v_skype = req.sanitize( 'skype' ).escape().trim();
+				// req.getConnection(function(err,connection){
+				// 	var query = connection.query('select * from af_list',function(err,rows)
+				// 	{
+				// 		if(err)
+				// 			var errslt  = ("Error Selecting : %s ",err );
+				// 		req.flash('msg_error', errslt);
+				var checkEmail = {
+					email: v_email,
+				}
 
-		var contact = {
-			af_id: v_afid,
-			name: v_name,
-			aftitle: v_aftitle,
-			address: v_address,
-			email: v_email,
-			phone : v_phone,
-			skype: v_skype,
-		}
+				var find_sql = 'select * from contact where ?';
 
-		var insert_sql = 'INSERT INTO contact SET ?';
-		req.getConnection(function(err,connection){
-			var query = connection.query(insert_sql, contact, function(err, result){
-				if(err)
-				{
-					var errors_detail  = ("Error Insert : %s ",err );   
-					req.flash('msg_error', errors_detail); 
-					res.render('contact/add', 
-					{ 
-						title: '出现了错误',
-						name: req.param('name'), 
-						aftitle: req.param('aftitle'),
-						address: req.param('address'),
-						email: req.param('email'),
-						phone: req.param('phone'),
-						skype: req.param('skype'),
+				req.getConnection(function(err, connection){
+					var query = connection.query(find_sql, checkEmail, function(err, result){
+						if(err){
+							var errors_detail  = ("Error Insert : %s ",err );   
+							req.flash('msg_error', errors_detail); 
+							res.render('contact/add', 
+							{ 
+								title: '出现了错误',
+								data:rows,
+								name: req.param('name'), 
+								aftitle: req.param('aftitle'),
+								address: req.param('address'),
+								email: req.param('email'),
+								phone: req.param('phone'),
+								skype: req.param('skype'),
+								username: res.locals.islogin,
+							});
+						}else{
+							console.log(result);
+							if(result.length > 0){
+							var errors_dup = "该Email已存在";
+							req.flash('msg_error', errors_dup);
+							res.render('contact/add',
+							{
+								title: '该Email已存在',
+								id: req.param('id'),
+								name: req.param('name'), 
+								aftitle: req.param('aftitle'),
+								address: req.param('address'),
+								email: req.param('email'),
+								phone: req.param('phone'),
+								skype: req.param('skype'),
+								data:rows,
+								username: res.locals.islogin,
+							});
+							}else if(result.length <= 0){
+								var contact = {
+									af_id: v_afid,
+									name: v_name,
+									aftitle: v_aftitle,
+									address: v_address,
+									email: v_email,
+									phone : v_phone,
+									skype: v_skype,
+								}
+								var insert_sql = 'INSERT INTO contact SET ?';
+								req.getConnection(function(err,connection){
+									var query = connection.query(insert_sql, contact, function(err, result){
+										if(err)
+										{
+											var errors_detail  = ("Error Insert : %s ",err );   
+											req.flash('msg_error', errors_detail); 
+											res.render('contact/add', 
+											{ 
+												title: '出现了错误',
+												name: req.param('name'), 
+												aftitle: req.param('aftitle'),
+												address: req.param('address'),
+												email: req.param('email'),
+												phone: req.param('phone'),
+												data:rows,
+												skype: req.param('skype'),
+												username: res.locals.islogin,
+											});
+										}else{
+											req.flash('msg_info', '成功添加联系人'); 
+											res.redirect('/contact');
+										}		
+									});
+								});
+							}
+						}
 					});
-				}else{
-					req.flash('msg_info', '成功添加联系人'); 
-					res.redirect('/contact');
-				}		
-			});
-		});
-	}else{
-		req.getConnection(function(err,connection){
-			var query = connection.query('select * from af_list',function(err,rows)
-			{
-				if(err)
-					var errslt  = ("Error Selecting : %s ",err );
-				req.flash('msg_error', errslt);
+				});
+				// 	});
+				// });
+			}else{
 
 				console.log(errors);
 				errors_detail = "<p>出现了以下错误</p><ul>";
@@ -373,32 +472,20 @@ router.post('/add', checkAuth, function(req, res, next) {
 
 				var data = rows;
 				res.render('contact/add',
-					{
-						title: '添加联系人出错',
-						name: req.param('name'),
-						aftitle: req.param('aftitle'),
-						email: req.param('email'),
-						phone: req.param('phone'),
-						skype: req.param('skype'),
-						address: req.param('address'),
-						data:rows,
-					});
-			});
-	     });
-
-		// res.render('contact/add', 
-		// { 
-		// 	title: "添加出错",
-		// 	// afid: req.params.afid,
-		// 	name: req.param('name'), 
-		// 	aftitle: req.param('aftitle'),
-		// 	address: req.param('address'),
-		// 	email: req.param('email'),
-		// 	phone: req.param('phone'),
-		// 	skype: req.param('skype'),
-		// });
-		// res.redirect('./add');
-	}
+				{
+					title: '添加联系人出错',
+					name: req.param('name'),
+					aftitle: req.param('aftitle'),
+					email: req.param('email'),
+					phone: req.param('phone'),
+					skype: req.param('skype'),
+					address: req.param('address'),
+					data:rows,
+					username: res.locals.islogin,
+				});
+			}
+		});
+	});
 
 });
 
@@ -639,8 +726,8 @@ router.get('/adduser', checkAuth, function(req, res, next) {
 	res.render(	'contact/adduser', 
 	{ 
 		title: '添加用户',
-		username: '',
-		password: '',
+		addusername: '',
+		addpassword: '',
 		username: res.locals.islogin,
 	});
 });
@@ -651,41 +738,83 @@ router.post('/adduser', checkAuth, function(req, res, next) {
 	if(req.session.islogin){
 		res.locals.islogin = req.session.islogin;
 	}
-	req.assert('username', '联系人姓名不能为空').notEmpty();
-	req.assert('password', '密码格式有误').notEmpty().len(8,20);
+	req.assert('addusername', '联系人姓名不能为空').notEmpty();
+	req.assert('addpassword', '密码格式有误').notEmpty().len(8,20);
 	var errors = req.validationErrors();
+
 	if (!errors) {
-		v_username = req.sanitize('username').escape().trim(); ;
-		v_password= req.param('password');
+		v_username = req.sanitize('addusername').escape().trim();
+		v_password= req.param('addpassword');
 		v_auth = req.param('auth');
 
 		// var md5 = crypto.createHash('md5');
 		var pswd = saltPass(v_password, 'user');
 
-		var user = {
+		// var user = {
+		// 	st_username: v_username,
+		// 	st_password: pswd,
+		// 	is_admin: v_auth,
+		// }
+
+		var checkUsr = {
 			st_username: v_username,
-			st_password: pswd,
-			is_admin: v_auth,
 		}
 
-		var insert_sql = 'INSERT INTO user SET ?';
-		req.getConnection(function(err,connection){
-			var query = connection.query(insert_sql, user, function(err, result){
-				if(err)
-				{
+		var find_sql = 'select * from user where ?';
+
+		req.getConnection(function(err, connection){
+			var query = connection.query(find_sql, checkUsr, function(err, result){
+				if(err){
 					var errors_detail  = ("Error Insert : %s ",err );   
 					req.flash('msg_error', errors_detail); 
 					res.render('contact/adduser', 
 					{ 
 						title: '出现了错误',
-						username: req.param('username'), 
+						addusername: req.param('addusername'), 
 						auth: req.param('auth'),
 						username: res.locals.islogin,
 					});
 				}else{
-					req.flash('msg_info', '成功添加用户'); 
-					res.redirect('./userlist');
-				}		
+					if(result.length > 0){
+						var errors_dup = "用户已存在";
+						req.flash('msg_error', errors_dup);
+						res.render('contact/adduser',
+						{
+							title: '用户名已存在',
+							addusername: req.param('addusername'),
+							auth: req.param('auth'),
+							username: res.locals.islogin,
+						});
+					}else if(result.length <= 0){
+
+						var user = {
+							st_username: v_username,
+							st_password: pswd,
+							is_admin: v_auth,
+						}
+
+						var insert_sql = 'INSERT INTO user SET ?';
+						req.getConnection(function(err,connection){
+							var query = connection.query(insert_sql, user, function(err, result){
+								if(err)
+								{
+									var errors_detail  = ("Error Insert : %s ",err );   
+									req.flash('msg_error', errors_detail); 
+									res.render('contact/adduser', 
+									{ 
+										title: '出现了错误',
+										addusername: req.param('addusername'), 
+										auth: req.param('auth'),
+										username: res.locals.islogin,
+									});
+								}else{
+									req.flash('msg_info', '成功添加用户'); 
+									res.redirect('./userlist');
+								}		
+							});
+						});
+					}
+				}
 			});
 		});
 	}else{
@@ -700,7 +829,7 @@ router.post('/adduser', checkAuth, function(req, res, next) {
 		req.flash('msg_error', errors_detail); 
 		res.render('contact/adduser', 
 		{ 
-			username:req.param('username'),
+			addusername:req.param('addusername'),
 			auth:req.param('auth'),
 			username: res.locals.islogin,
 		});
