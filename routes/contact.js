@@ -2,6 +2,12 @@ var express = require('express');
 var router = express.Router();
 var crypto = require('crypto');
 /* GET contact page. */
+function sortByKey(array, key) {
+    return array.sort(function(a, b) {
+        var x = a[key].toLowerCase(); var y = b[key].toLowerCase();
+        return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+    });
+}
 
 router.all(/\/*/,function(req, res, next){
 	req.getConnection(function(err,connection){
@@ -10,6 +16,8 @@ router.all(/\/*/,function(req, res, next){
 	        if(err)
 	          var errornya  = ("Error Selecting : %s ",err );   
 	        req.flash('msg_error', errornya);
+	        rows = sortByKey(rows,'af_afname');
+	        console.log(rows);
 	        req.list = rows;
 	        next();
     	});
