@@ -275,8 +275,8 @@ router.put('/edit/(:id)', checkAdmin, function(req,res,next){
 					});
 				}else{
 					console.log(result);
-					if(result.length > 0){
-					var errors_dup = "该Email已存在";
+					if(result.length > 0 && result[0].id != req.params.id){
+					var errors_dup = "该Email已被其他联系人使用";
 					req.flash('msg_error', errors_dup);
 					res.render('contact/edit',
 					{
@@ -290,7 +290,7 @@ router.put('/edit/(:id)', checkAdmin, function(req,res,next){
 						skype: req.param('skype'),
 						username: res.locals.islogin,
 					});
-					}else if(result.length <= 0){
+					}else{
 						var contact = {
 							name: v_name,
 							aftitle: v_aftitle,
