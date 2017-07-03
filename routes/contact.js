@@ -65,6 +65,7 @@ function loadUser(req, res, next){
 							console.log(req.list);
 							res.render('contact/afnamelist',
 							{
+								title:'用户不存在',
 								data:req.list,
 								username:req.param('username'),
 								password:'',
@@ -73,12 +74,12 @@ function loadUser(req, res, next){
 							if(rows[0].st_password === pswd){
 								req.session.islogin = req.param('username');
 								res.locals.islogin = req.session.islogin;
-								res.cookie('islogin',res.locals.islogin,{maxAge: 3*60*60*1000});
+								res.cookie('islogin',res.locals.islogin,{maxAge: 24*60*60*1000});
 								req.flash('msg_info', '登陆成功');
 								if(rows[0].is_admin === 1){
 									req.session.isadmin = rows[0].is_admin;
 									res.locals.isadmin = req.session.isadmin;
-									res.cookie('isadmin',res.locals.isadmin,{maxAge: 3*60*60*1000});
+									res.cookie('isadmin',res.locals.isadmin,{maxAge: 24*60*60*1000});
 								}
 								res.render('contact/afnamelist',
 								{
